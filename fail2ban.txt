@@ -1,0 +1,65 @@
+# install and configure fail2ban
+sudo apt install -y fail2ban
+
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+
+# Extend fail2ban config with jailing invalid user attempts
+# https://askubuntu.com/questions/270518/fail2ban-or-denyhosts-to-block-invalid-username-ssh-login-attempts
+cat > /etc/fail2ban/filter.d/sshd-invaliduser.conf <<EOF
+[INCLUDES]
+before = common.conf
+
+[Definition]
+_daemon = sshd
+
+failregex = ^%(__prefix_line)s[iI](?:llegal|nvalid) user .*? from <HOST>(?: port \d+)?\s*$
+ignoreregex = 
+
+[Init]
+journalmatch = _SYSTEMD_UNIT=sshd.service + _COMM=sshd
+EOF
+
+cat > /etc/fail2ban/jail.d/sshd-invaliduser.conf <<EOF
+[sshd-invaliduser]
+enabled = true
+maxretry = 3
+port    = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
+EOF
+
+
+systemctl restart fail2ban
+
+
+
+
+# Extend fail2ban config with jailing invalid user attempts
+# https://askubuntu.com/questions/270518/fail2ban-or-denyhosts-to-block-invalid-username-ssh-login-attempts
+cat > /etc/fail2ban/filter.d/sshd-invaliduser.conf <<EOF
+[INCLUDES]
+before = common.conf
+
+[Definition]
+_daemon = sshd
+
+failregex = ^%(__prefix_line)s[iI](?:llegal|nvalid) user .*? from <HOST>(?: port \d+)?\s*$
+ignoreregex = 
+
+[Init]
+journalmatch = _SYSTEMD_UNIT=sshd.service + _COMM=sshd
+EOF
+
+cat > /etc/fail2ban/jail.d/sshd-invaliduser.conf <<EOF
+[sshd-invaliduser]
+enabled = true
+maxretry = 3
+port    = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
+EOF
+
+
+systemctl restart fail2ban
+
